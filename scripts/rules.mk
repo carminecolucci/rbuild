@@ -7,7 +7,7 @@ quiet_cmd_cc_s_c = CC      $@
 cmd_cc_s_c = $(CC) -o $@ $(cc_flags) -fverbose-asm -S $<
 
 $(obj)/%.s: $(src)/%.c
-$(call cmd,cc_s_c)
+	$(call cmd,cc_s_c)
 
 # .c -> .o
 quiet_cmd_cc_o_c = CC      $@
