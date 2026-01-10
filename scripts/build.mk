@@ -10,7 +10,7 @@ src := $(obj)
 # default target
 build-all:
 
-# ==========================================================
+# ===========================================================
 # User available variables
 objs		:=
 libs		:=
@@ -26,20 +26,20 @@ ldflags		:=
 # flags applied to the current directory and to every subdirectory
 subdir-asflags	:=
 subdir-ccflags	:=
-# ==========================================================
+# ===========================================================
 
-include scripts/include.mk
+include $(rbuild)/scripts/include.mk
 
 # include directory Makefile
 include $(src)/Makefile
 
 # Flags
-# ==========================================================
+# ===========================================================
 DEPSFLAGS	:= -MD -MMD
 INCLUDES	:= $(addprefix -I,$(INCLUDE_DIR))
 CFLAGS		:= $(addprefix -W,$(WARNINGS)) $(CFLAGS)
 
-# ==========================================================
+# ===========================================================
 # flags used to make rules are combined in the following order:
 #	- project level flags
 #	- subdirectory flags
@@ -55,7 +55,7 @@ cc_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CFLAGS) $(SUBDIR_CCFLAGS) $(ccflags) $(cc
 cpp_flags	:= $(DEPSFLAGS) $(INCLUDES) $(cppflags)
 ld_flags	:= $(LDFLAGS) $(ldflags)
 
-# =============================================================
+# ===========================================================
 
 # get subdirectories to descend into
 subdir	:= $(patsubst %/,%, $(filter %/, $(objs) $(libs)))
@@ -94,10 +94,10 @@ endif
 build-all: $(target-obj) $(target-lib) $(shlibs)
 	@:
 
-include scripts/rules.mk
+include $(rbuild)/scripts/rules.mk
 
 # Descend into subdirectories:
-# ======================================
+# ===========================================================
 
 # Descend into subdirectories to make built-in.o and lib.a targets
 .PHONY: $(subdir-target-objs) $(subdir-target-libs)
@@ -106,7 +106,7 @@ $(subdir-target-objs) $(subdir-target-libs): $(subdir)
 .PHONY: $(subdir)
 $(subdir):
 	$Q$(MAKE) $(build)=$@
-# ======================================
+# ===========================================================
 
 # Include dependency files
 deps := $(objs:.o=.d)

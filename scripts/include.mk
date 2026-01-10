@@ -1,9 +1,9 @@
 # Each makefile executes with $(build)=dir.
 # usage: $(MAKE) $(build)=dir
-# this expands to: $(MAKE) -f scripts/build.mk obj=dir.
-build := -f scripts/build.mk obj
+# this expands to: $(MAKE) -f $(rbuild)/scripts/build.mk obj=dir.
+build := -f $(rbuild)/scripts/build.mk obj
 
-clean := -f scripts/clean.mk obj
+clean := -f $(rbuild)/scripts/clean.mk obj
 
 # filename of target with directory and extension stripped
 basetarget = $(basename $(notdir $@))
