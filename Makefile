@@ -29,7 +29,7 @@ SHARED_LIBS :=
 export AR AS CC CPP LD RM
 
 ifeq ($(DEBUG),1)
-  ASFLAGS	+= -G
+  ASFLAGS	+= -g
   CFLAGS	+= -Og
 endif
 
@@ -166,7 +166,7 @@ help:
 	@echo "                     0 => quiet build (default)"
 	@echo "                     1 => verbose build"
 	@echo ""
-	@echo "  DEBUG=1            => debug build"
+	@echo "  DEBUG=1:           => debug build"
 	@echo "  -s                 => silent build"
 
 endif # single-build
