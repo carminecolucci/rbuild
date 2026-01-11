@@ -15,7 +15,7 @@ objs	:=
 libs	:=
 shlibs	:=
 
-include scripts/include.mk
+include $(rbuild)/scripts/include.mk
 
 # include subdir makefile
 include $(src)/Makefile
