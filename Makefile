@@ -1,5 +1,40 @@
 # Project level Makefile.
 
+# ====================================================
+# project variables
+export TARGET		:=
+export SRC_DIR		:=
+export LIB_DIR		:=
+export SHLIB_DIR	:=
+export INCLUDE_DIR	:=
+
+AR	:= ar
+AS	:= as
+CC	:= gcc
+CPP	:= $(CC) -E
+LD	:= ld
+RM	:= rm
+
+# project level flags
+ASFLAGS		:=
+CFLAGS		:=
+WARNINGS	:= all extra pedantic
+LDFLAGS		:=
+
+# project libraries
+STATIC_LIBS :=
+SHARED_LIBS :=
+# ====================================================
+
+export AR AS CC CPP LD RM
+
+ifeq ($(DEBUG),1)
+  ASFLAGS	+= -G
+  CFLAGS	+= -Og
+endif
+
+export ASFLAGS CFLAGS WARNINGS LDFLAGS
+
 # default target
 all:
 
@@ -24,7 +59,7 @@ ifneq ($(findstring s,$(MAKEFLAGS)),)
   quiet	:= silent_
 endif
 
-export quiet Q RBUILD_VERBOSE
+export quiet Q
 
 # absolute path to project source
 this_makefile := $(lastword $(MAKEFILE_LIST))
@@ -32,49 +67,22 @@ export rbuild := $(realpath $(dir $(this_makefile)))
 
 include $(rbuild)/scripts/include.mk
 
-# project variables
-# ====================================================
-export TARGET		:=
-export SRC_DIR		:=
-export LIB_DIR		:=
-export SHLIB_DIR	:=
-export INCLUDE_DIR	:=
-
-AR	:= ar
-AS	:= as
-CC	:= gcc
-CPP	:= $(CC) -E
-LD	:= ld
-RM	:= rm
-
-export AR AS CC CPP LD RM
-
-# project level flags
-# ====================================================
-ASFLAGS		:=
-CFLAGS		:=
-WARNINGS	:= all extra pedantic
-LDFLAGS		:=
-
-ifeq ($(DEBUG),1)
-  ASFLAGS	+= -g
-  CFLAGS	+= -Og
-endif
-
-export ASFLAGS CFLAGS WARNINGS LDFLAGS
-
-# project libraries
-# ====================================================
-STATIC_LIBS :=
-SHARED_LIBS := shtest
-# ====================================================
 
 # Build a single directory `make path/to/dir/`.
 # Descending in these directories is handled using
 # `make $(build)=path/to/dir`
-single-dirs := $(sort $(filter %/, $(MAKECMDGOALS)))
+single-dirs	:= $(sort $(filter %/, $(MAKECMDGOALS)))
 
-ifdef single-dirs
+# Build a single target `make path/to/file.[aios]`.
+single-targets	:= %.a %.i %.o %.s
+single-files	:= $(sort $(filter $(single-targets), $(MAKECMDGOALS)))
+
+single-build	:=
+ifneq ($(strip $(single-dirs) $(single-files)),)
+  single-build	:= 1
+endif
+
+ifneq ($(single-dirs),)
 
 # Remove trailing slash to get real recursion targets
 target-dirs := $(patsubst %/,%,$(single-dirs))
@@ -83,7 +91,24 @@ target-dirs := $(patsubst %/,%,$(single-dirs))
 $(single-dirs): %/: %
 	@:
 
-else	# ifndef single-dirs
+endif	# single-dirs
+
+ifneq ($(single-files),)
+
+file-dirs := $(sort $(patsubst %/,%,$(dir $(single-files))))
+
+# dir/file.o -> dir
+$(single-files): $(file-dirs)
+	@:
+
+# descend and pass down only the appropriate files
+.PHONY: $(file-dirs)
+$(file-dirs):
+	$Q$(MAKE) $(build)=$@ $(filter $@/%, $(MAKECMDGOALS))
+
+endif	# single-files
+
+ifndef single-build
 # Other targets are handled here
 
 target-objs	:= $(addsuffix /built-in.o, $(SRC_DIR))
@@ -117,11 +142,11 @@ target-dirs	:= $(SRC_DIR) $(LIB_DIR) $(SHLIB_DIR)
 %/lib.a: %
 	@:
 
-clean-dirs := $(addprefix clean_,$(target-dirs))
+clean-dirs := $(addprefix _clean_,$(target-dirs))
 
 .PHONY: $(clean-dirs)
 $(clean-dirs):
-	$Q$(MAKE) $(clean)=$(patsubst clean_%,%,$@)
+	$Q$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
 
 .PHONY: clean
 clean: $(clean-dirs)
@@ -130,21 +155,21 @@ clean: $(clean-dirs)
 help:
 	@echo ""
 	@echo "Targets:"
-	@echo "  all:    build all targets (default)"
-	@echo "  $(TARGET):   build the project"
-	@echo "  dir/:   build all files in dir/"
-	@echo "  help:   show this message"
-	@echo "  clean:  remove all generated files"
+	@echo "  all:               build all targets (default)"
+	@echo "  dir/:              build all files in dir/"
+	@echo "  dir/file.[aios]:   build specified target only"
+	@echo "  help:              show this message"
+	@echo "  clean:             remove all generated files"
 	@echo ""
 	@echo "Flags:"
 	@echo "  V=[01]:"
-	@echo "          0 => quiet build (default)"
-	@echo "          1 => verbose build"
+	@echo "                     0 => quiet build (default)"
+	@echo "                     1 => verbose build"
 	@echo ""
-	@echo "  DEBUG=1   => debug build"
-	@echo "  -s        => silent build"
+	@echo "  DEBUG=1            => debug build"
+	@echo "  -s                 => silent build"
 
-endif # single-dirs
+endif # single-build
 
 # ===========================================================
 # Descend into directory

@@ -2,9 +2,16 @@
 
 # ==========================================================
 # C files
+# .c -> .i
+quiet_cmd_cc_i_c = CPP     $@
+      cmd_cc_i_c = $(CPP) -o $@ $(cc_flags) $<
+
+$(obj)/%.i: $(src)/%.c
+	$(call cmd,cc_i_c)
+
 # .c -> .s
 quiet_cmd_cc_s_c = CC      $@
-cmd_cc_s_c = $(CC) -o $@ $(cc_flags) -fverbose-asm -S $<
+      cmd_cc_s_c = $(CC) -o $@ $(cc_flags) -fverbose-asm -S $<
 
 $(obj)/%.s: $(src)/%.c
 	$(call cmd,cc_s_c)
