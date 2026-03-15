@@ -30,7 +30,7 @@ export AR AS CC CPP LD RM
 
 ifeq ($(DEBUG),1)
   ASFLAGS	+= -g
-  CFLAGS	+= -Og
+  CFLAGS	+= -Og -g
 endif
 
 export ASFLAGS CFLAGS WARNINGS LDFLAGS
