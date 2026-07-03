@@ -170,3 +170,15 @@ ccflags-file1 := -Wshadow -DDEBUG
 asflags-file2 := -march=armv8-a
 ```
 
+### Command Line Flags
+
+Rbuild supports several command line variables and flags to control the build output and behavior. These can be passed directly when invoking `make`.
+
+* `CROSS_COMPILE` (Toolchain prefix)
+
+* `V=[0|1]` (Verbose build)
+
+* `DEBUG=1` (Debug build)
+
+* `-s` (Silent mode)
+

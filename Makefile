@@ -8,11 +8,11 @@ export LIB_DIR		:=
 export SHLIB_DIR	:=
 export INCLUDE_DIR	:=
 
-AR	:= ar
-AS	:= as
-CC	:= gcc
+AR	:= $(CROSS_COMPILE)ar
+AS	:= $(CROSS_COMPILE)as
+CC	:= $(CROSS_COMPILE)gcc
+LD	:= $(CROSS_COMPILE)ld
 CPP	:= $(CC) -E
-LD	:= ld
 RM	:= rm
 
 # project level flags
