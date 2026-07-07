@@ -8,6 +8,10 @@ export LIB_DIR		:=
 export SHLIB_DIR	:=
 export INCLUDE_DIR	:=
 
+# Set to 1 for kernel, firmware and bare metal apps
+# This changes the final link stage
+export BARE_METAL ?= 0
+
 AR	:= $(CROSS_COMPILE)ar
 AS	:= $(CROSS_COMPILE)as
 CC	:= $(CROSS_COMPILE)gcc
@@ -19,6 +23,7 @@ RM	:= rm
 ASFLAGS		:=
 CFLAGS		:=
 WARNINGS	:= all extra pedantic
+CPPFLAGS	:=
 LDFLAGS		:=
 
 # project libraries
@@ -33,7 +38,7 @@ ifeq ($(DEBUG),1)
   CFLAGS	+= -Og -g
 endif
 
-export ASFLAGS CFLAGS WARNINGS LDFLAGS
+export ASFLAGS CFLAGS WARNINGS CPPFLAGS LDFLAGS
 
 # default target
 all:
@@ -111,7 +116,7 @@ endif	# single-files
 ifndef single-build
 # Other targets are handled here
 
-target-objs	:= $(addsuffix /built-in.o, $(SRC_DIR))
+target-objs	:= $(addsuffix /built-in.a, $(SRC_DIR))
 target-libs	:= $(addsuffix /lib.a, $(LIB_DIR))
 
 LIBS	:=
@@ -123,20 +128,19 @@ ifneq ($(SHARED_LIBS),)
   LIBS	+= -L$(SHLIB_DIR) $(addprefix -l,$(SHARED_LIBS))
 endif
 
-quiet_cmd_cc_target = CC      $@
-      cmd_cc_target = $(CC) -o $@ $(LDFLAGS) -Wl,--start-group $(target-libs) $(target-objs) $(LIBS) -Wl,--end-group -Wl,-rpath,$(SHLIB_DIR)
+export LIBS
 
 .PHONY: all
 all: $(TARGET)
 
 .PHONY: $(TARGET)
 $(TARGET): $(target-objs) $(target-libs) | $(SHLIB_DIR)
-	$(call cmd,cc_target)
+	$Q$(MAKE) $(link)=$@ prereqs="$^"
 
 target-dirs	:= $(SRC_DIR) $(LIB_DIR) $(SHLIB_DIR)
 
-# to build dir/built-in.o descend into dir
-%/built-in.o: %
+# to build dir/built-in.a descend into dir
+%/built-in.a: %
 	@:
 
 %/lib.a: %

@@ -34,7 +34,7 @@ $(shobjs): $(obj)/%.o: $(src)/%.c
 # Assembly files
 # .s -> .o
 quiet_cmd_cc_o_s = AS      $@
-      cmd_cc_o_s = $(AS) -o $@ $(as_flags) $<
+      cmd_cc_o_s = $(CC) -o $@ $(as_flags) -c $<
 
 $(obj)/%.o: $(src)/%.s
 	$(call cmd,cc_o_s)
@@ -57,23 +57,31 @@ $(obj)/%.s: $(src)/%.S
 # Object files
 
 ifdef target-obj
-# Link objects into built-in.o:
-quiet_cmd_ld_o_o = LD      $@
-      cmd_ld_o_o = $(LD) -o $@ -r $(ld_flags) $^
+
+  ifeq ($(BARE_METAL),1)
+    # bare metal target: no symbol tables for built-in.a
+    AR_BUILTIN_FLAGS := cDPrST
+  else
+    # user space target: add symbol tables to built-in.a
+    AR_BUILTIN_FLAGS := cDPrsT
+  endif
+
+quiet_cmd_ar_builtin = AR      $@
+      cmd_ar_builtin = $(RM) -f $@; $(AR) $(AR_BUILTIN_FLAGS) $@ $^
 
 .PHONY: $(target-obj)
 $(target-obj): $(objs) $(subdir-target-objs)
-	$(call cmd,ld_o_o)
+	$(call cmd,ar_builtin)
 endif # target-obj
 
 ifdef target-lib
-# Link objects into lib.a:
-quiet_cmd_ar_a_o = AR      $@
-      cmd_ar_a_o = $(RM) -f $@; $(AR) rcsTP $@ $^
+
+quiet_cmd_ar_lib = AR      $@
+      cmd_ar_lib = $(RM) -f $@; $(AR) cDPrsT $@ $^
 
 .PHONY: $(target-lib)
-$(target-lib): $(libs) $(subdir-target-libs)
-	$(call cmd,ar_a_o)
+$(target-lib): $(libs)
+	$(call cmd,ar_lib)
 endif # target-lib
 
 # Link position independent objects in a shared library

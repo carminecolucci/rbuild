@@ -50,9 +50,9 @@ CFLAGS		:= $(addprefix -W,$(WARNINGS)) $(CFLAGS)
 export SUBDIR_ASFLAGS := $(SUBDIR_ASFLAGS) $(subdir-asflags)
 export SUBDIR_CCFLAGS := $(SUBDIR_CCFLAGS) $(subdir-ccflags)
 
-as_flags	 = $(INCLUDES) $(ASFLAGS) $(SUBDIR_ASFLAGS) $(asflags) $(asflags-$(basetarget))
-cc_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CFLAGS) $(SUBDIR_CCFLAGS) $(ccflags) $(ccflags-$(basetarget))
-cpp_flags	:= $(DEPSFLAGS) $(INCLUDES) $(cppflags)
+as_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(ASFLAGS) $(SUBDIR_ASFLAGS) $(asflags) $(asflags-$(basetarget))
+cc_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(SUBDIR_CCFLAGS) $(ccflags) $(ccflags-$(basetarget))
+cpp_flags	:= $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(cppflags)
 ld_flags	:= $(LDFLAGS) $(ldflags)
 
 # ===========================================================
@@ -60,8 +60,8 @@ ld_flags	:= $(LDFLAGS) $(ldflags)
 # get subdirectories to descend into
 subdir	:= $(patsubst %/,%, $(filter %/, $(objs) $(libs)))
 
-# replace each occurrence of dir/ with dir/built-in.o or dir/lib.a
-objs	:= $(patsubst %/,%/built-in.o, $(objs))
+# replace each occurrence of dir/ with dir/built-in.a or dir/lib.a
+objs	:= $(patsubst %/,%/built-in.a, $(objs))
 libs	:= $(patsubst %/,%/lib.a, $(libs))
 
 # get shared objects for each dynamic library
@@ -75,13 +75,13 @@ subdir	:= $(addprefix $(obj)/, $(subdir))
 shobjs	:= $(addprefix $(obj)/, $(shobjs))
 
 # get subdir targets
-subdir-target-objs	:= $(filter %/built-in.o, $(objs))
+subdir-target-objs	:= $(filter %/built-in.a, $(objs))
 subdir-target-libs	:= $(filter %/lib.a, $(libs))
 
 # ===========================================================
-# all objects in `objs` are compiled into a single built-in.o
+# all objects in `objs` are compiled into a single built-in.a
 ifneq ($(strip $(objs)),)
-  target-obj := $(obj)/built-in.o
+  target-obj := $(obj)/built-in.a
 endif
 
 # all objects in `libs` are compiled into a single lib.a
@@ -99,7 +99,7 @@ include $(rbuild)/scripts/rules.mk
 # Descend into subdirectories:
 # ===========================================================
 
-# Descend into subdirectories to make built-in.o and lib.a targets
+# Descend into subdirectories to make built-in.a and lib.a targets
 .PHONY: $(subdir-target-objs) $(subdir-target-libs)
 $(subdir-target-objs) $(subdir-target-libs): $(subdir)
 
@@ -108,7 +108,10 @@ $(subdir):
 	$Q$(MAKE) $(build)=$@
 # ===========================================================
 
+all-targets := $(objs) $(libs) $(shobjs)
+real-objs := $(filter %.o, $(all-targets))
+
 # Include dependency files
-deps := $(objs:.o=.d)
+deps := $(real-objs:.o=.d)
 -include $(deps)
 

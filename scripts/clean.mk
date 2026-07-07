@@ -32,7 +32,7 @@ shlibs	:= $(addprefix $(obj)/, $(shlibs))
 subdir := $(patsubst %/,%, $(filter %/, $(objs) $(libs)))
 
 ifneq ($(strip $(objs)),)
-  target-obj := $(obj)/built-in.o
+  target-obj := $(obj)/built-in.a
 endif
 
 ifneq ($(strip $(libs)),)

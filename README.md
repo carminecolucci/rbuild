@@ -50,13 +50,15 @@ export INCLUDE_DIR	:= include
 
 `SHLIB_DIR` (optional) shared libraries directory. It can be different from `LIB_DIR`.
 
+`BARE_METAL` set to 1 if you are developing an OS/firmware.
+
 ## Variables
 
 Each directory that contains source code gets its own Makefile. Each Makefile is only responsile for building objects in its directory.
 
 There are two user available variables to tell Rbuild which files to produce:
 
-- `objs`: all objects added here are combined in a single `built-in.o` for that directory.
+- `objs`: all objects added here are combined in a single `built-in.a` for that directory.
 
 - `libs`: all objects added here are combined in a single `lib.a` for that directory. The use of this variable should be restricted to `LIB_DIR`.
 
@@ -140,7 +142,7 @@ To link the libraries, add them to `STATIC_LIBS`/`SHARED_LIBS` in the project le
 
 ### Project level flags
 
-`ASFLAGS`, `CFLAGS`, `WARNINGS`, `LDFLAGS` can be set directly in the project level Makefile. They are applied to the whole project.
+`ASFLAGS`, `CFLAGS`, `WARNINGS`, `CPPFLAGS`, `LDFLAGS` can be set directly in the project level Makefile. They are applied to the whole project.
 
 Warnings must be specified without the `-W` prefix, it will be added automatically.
 ```make
