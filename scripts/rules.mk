@@ -54,6 +54,15 @@ $(obj)/%.s: $(src)/%.S
 	$(call cmd,cpp_s_S)
 
 # ==========================================================
+# Linker script
+# .ld.S -> .ld
+quiet_cmd_cpp_ldS_ld = LDS     $@
+      cmd_cpp_ldS_ld = $(CPP) -o $@ $(cpp_flags) -P -U$(ARCH) -D__ASSEMBLY__ -DLINKER_SCRIPT $<
+
+$(obj)/%.ld: $(src)/%.ld.S
+	$(call cmd,cpp_ldS_ld)
+
+# ==========================================================
 # Object files
 
 ifdef target-obj

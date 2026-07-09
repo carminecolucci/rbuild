@@ -158,6 +158,10 @@ WARNINGS := all extra
 ccflags += -O2
 ```
 
+> [!NOTE]
+> For C and assembly files, add preprocessor flags to `ccflags` and `asflags`, respectively.
+> `cppflags` is used to add preprocessor flags used for different filetypes that might need preprocessing (e.g `ld.S`).
+
 ### Subdir flags
 
 `subdir-asflags`, `subdir-ccflags` set additonal flags to the assembler and compiler, respectively. These flags are applied in the current directory of the Makefile and in every subdirectory.
@@ -175,6 +179,8 @@ asflags-file2 := -march=armv8-a
 ### Command Line Flags
 
 Rbuild supports several command line variables and flags to control the build output and behavior. These can be passed directly when invoking `make`.
+
+* `ARCH` (Target architecture. Additional flags can be set into `/arch/$ARCH/Makefile`.)
 
 * `CROSS_COMPILE` (Toolchain prefix)
 

@@ -50,11 +50,6 @@ CFLAGS		:= $(addprefix -W,$(WARNINGS)) $(CFLAGS)
 export SUBDIR_ASFLAGS := $(SUBDIR_ASFLAGS) $(subdir-asflags)
 export SUBDIR_CCFLAGS := $(SUBDIR_CCFLAGS) $(subdir-ccflags)
 
-as_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(ASFLAGS) $(SUBDIR_ASFLAGS) $(asflags) $(asflags-$(basetarget))
-cc_flags	 = $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(SUBDIR_CCFLAGS) $(ccflags) $(ccflags-$(basetarget))
-cpp_flags	:= $(DEPSFLAGS) $(INCLUDES) $(CPPFLAGS) $(cppflags)
-ld_flags	:= $(LDFLAGS) $(ldflags)
-
 # ===========================================================
 
 # get subdirectories to descend into
